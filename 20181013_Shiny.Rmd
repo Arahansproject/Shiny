@@ -1,0 +1,354 @@
+---
+title: "20181013 Shiny"
+output: 
+---
+
+#### ActionButton
+
+```{r}
+library(shiny)
+library(shinydashboard)
+library(shinyjs)
+
+library(shiny)
+
+ui <- fluidPage(
+  actionButton("action",
+               label = "액션버튼"
+               ),
+  hr(),
+  verbatimTextOutput("value")
+)
+
+server <- function(input, output, session) {
+  onclick("btn",info(date()))
+}
+
+shinyApp(ui, server)
+
+```
+#### Action Button choices
+```{r}
+library(shiny)
+library(shinydashboard)
+library(shinyjs)
+
+library(shiny)
+
+ui <- fluidPage(
+  actionButton("chk",
+               label = h3("선택"),
+               value = TRUE
+  ),
+  hr(),
+  fluidRow()
+)
+
+server <- function(input, output, session) {
+  output$value <- renderText({input$chk})
+}
+
+shinyApp(ui, server)
+
+```
+
+#### Calendar
+```{r}
+library(shiny)
+library(shinydashboard)
+library(shinyjs)
+
+library(shiny)
+
+ui <- fluidPage(
+  dateInput("date",
+            label = h3("날짜입력"),
+            value = "2018-01-01"),
+hr(),
+fluidRow(column(3, verbatimTextOutput("value")))
+)
+
+server <- function(input, output, session) {
+  output$value <- renderPrint({input$date})
+}
+
+shinyApp(ui, server)
+
+```
+
+#### Check Box
+```{r}
+library(shiny)
+library(shinydashboard)
+library(shinyjs)
+
+library(shiny)
+
+ui <- fluidPage(
+  actionButton("chk",
+               label = h3("체크박스그룹"),
+               choices = list("선택1"=1,
+                              "선택2"=2,
+                              "선택3"=3
+                              ),
+               selected = 1
+                ),
+  hr(),
+  fluidRow()
+)
+
+server <- function(input, output, session) {
+  output$value <- renderText({input$chk})
+}
+
+shinyApp(ui, server)
+
+```
+
+#### Date
+```{r}
+install.packages("rvest")
+install.packages("shiny")
+install.packages("shinydashboard")
+install.packages("shinyjs")
+
+library(shiny)
+library(shinydashboard)
+library(shinyjs)
+
+library(shiny)
+
+ui <- fluidPage(
+  actionButton("date",
+               label = "액션버튼"
+  ),
+  hr(),
+  verbatimTextOutput("value")
+)
+
+server <- function(input, output, session) {
+  output$value = renderText({input$action})
+}
+
+shinyApp(ui, server)
+
+```
+
+#### File
+```{r}
+library(shiny)
+library(shinydashboard)
+library(shinyjs)
+
+library(shiny)
+
+ui <- fluidPage(
+  fileInput("file",
+                 label = h3("파일 업로드")
+  ),
+  hr(),
+  fluidRow(column(4, verbatimTextOutput("value")))
+)
+
+server <- function(input, output, session) {
+  output$value <- renderPrint({str(input$file)})
+}
+
+shinyApp(ui, server)
+
+```
+
+#### Gender Check
+```{r}
+library(shiny)
+library(shinyjs)
+
+gender <- function(x){
+  t <- substr(x,8,8) # x는 주민등록번호이고 여기서 8번째, 8자리까지만 추출해라
+  cat('\n SSN 에서 추출한 값:',t)  # print(t)는 값만 보여주므로  cat으로 추출값 확인
+  y <- switch(t,
+         '1'='남성',
+         '2'='여성',
+         '3'='남성',
+         '4'='여성',
+         '5'='외국인',
+         '6'='외국인',
+         '잘못된 값'
+         )
+  cat('\n 결과값:', y)
+  return(y)
+}
+
+ui <- fluidPage(
+  useShinyjs(),
+  textInput("txt",
+            label = h3("주민번호앞자리 입력"),
+            value ="(예시)900101-2"),
+  actionButton("btn", "확 인")
+)
+
+server <- function(input, output, session) {
+  onclick("btn",
+          info({gender(input$txt)})
+          )
+  # output $value <- renderText({gender(input$txt)})
+  # 성별을 체크하는 함수 코딩
+}
+
+shinyApp(ui, server)
+
+
+```
+
+#### Radio Button
+```{r}
+if("plotly" %in% installed.packages("plotly") == FALSE)install.packages("plotly")
+library(plotly)
+library(shiny)
+data <- data.frame(
+  Population <- sample(1:20,10,replace = T),
+  HouseHolds <- sample(1:20,10,replace = T),
+  year <- sample(c(2000,2010),10,replace = T)
+)
+
+ui <- fluidPage(
+  titlePanel(
+    title = h4("인구 조사", align = "center")
+  ),
+  sidebarPanel(
+    sidebarLayout(
+      radioButtons("YEAR","10년 주기선택",
+                   choices = c("2000", "2010"),
+                   selected = "2000"
+      )
+    )
+  ),
+  mainPanel(
+    plotOutput("bar",height=500)
+  )
+)
+
+server <- function(input, output, session){
+  reactive_data <- reactive({
+    selected.year <- as.numeric(input$YEAR)
+    return(data[data$year == selected_year])
+  })
+  output$bar <- renderPlot({
+    color <- c("blud", "red")
+    our_data <- reactive_data()
+    barplot(colSums(our_data[,c("Population","HouseHolds")]),
+            ylab <- "Total",
+            xlab <- "Census Year",
+            names.arg = c("Population","HouseHolds"),
+            col = color)
+  })
+}
+
+shinyApp(ui, server)
+
+```
+
+#### Reservation
+```{r}
+library(shiny)
+library(shinydashboard)
+library(shinyjs)
+
+library(shiny)
+
+ui <- fluidPage(
+  dateRangeInput("date",
+                 label = h3("기간 설정")
+                 ),
+  hr(),
+  fluidRow(column(4, verbatimTextOutput("value")))
+)
+
+server <- function(input, output, session) {
+  output$value <- renderPrint({input$action})
+}
+
+shinyApp(ui, server)
+
+
+
+```
+
+#### Selectinput
+```{r}
+library(shiny)
+library(shinydashboard)
+library(shinyjs)
+
+library(shiny)
+
+ui <- fluidPage(
+  selectInput("select",
+            label = h3("셀렉트 박스"),
+            choices = list(
+              "선택1" = 1,
+              "선택2" = 2,
+              "선택3" = 3
+              ),
+            selected = 1,
+  hr(),
+  fluidRow(column(3, verbatimTextOutput("value")))
+)
+
+server <- function(input, output, session) {
+  output$value <- renderPrint({input$date})
+}
+
+shinyApp(ui, server)
+
+
+```
+
+#### Slider
+```{r}
+if("shiny" %in% installed.packages("shiny") == FALSE)install.packages("shiny")
+library(shiny)
+ui <- shiny::fluidPage(
+  sliderInput(
+    inputId = "num1",
+    label = "숫자를 선택하세요",
+    value = 25,
+    min =1,
+    max = 50,
+    step = 1
+  ),
+  plotOutput("hist")
+)
+server <- function(input, output){
+          output$hist <- renderPlot({
+          hist(rnorm(input$num1),
+          maing = "50 범위내에서 선택")
+    })
+}
+
+shiny::shinyApp(ui, server)
+
+```
+
+#### TextInput
+```{r}
+library(shiny)
+library(shiny)
+
+ui <- fluidPage(
+  textInput("txt",
+            label = h3("로그인"),
+            value = "ID를 입력"
+            ),
+  hr(),
+  fluidRow(column(3, verbatimTextOutput("value")))
+)
+
+server <- function(input, output, session) {
+  output $value <- renderText({input$txt})
+}
+
+shinyApp(ui, server)
+```
+
+
